@@ -127,7 +127,7 @@ class Sapper {
     { i: 1, j: 1 },
   ];
   size = 16;
-  startMines = 10;
+  startMines = 40;
 
   mat = [];
   timer = new Timer(document.getElementById("timer"));
