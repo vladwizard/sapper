@@ -1,0 +1,25 @@
+body {
+
+}
+#wrapper{
+  width: max-content;
+  margin: auto;
+}
+header {
+  height: 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+header > div {
+  display: inherit;
+}
+main {
+  display: grid;
+  grid-template-columns: repeat(16, 16px);
+}
+#smiley{
+  position: absolute;
+  left: 50%;
+  transform: translate(-50%);
+}

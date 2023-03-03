@@ -1,0 +1,126 @@
+.counter0,
+.counter1,
+.counter2,
+.counter3,
+.counter4,
+.counter5,
+.counter6,
+.counter7,
+.counter8,
+.counter9 {
+  width: 13px;
+  height: 23px;
+}
+
+.counter1 {
+  background: url(image.png) 0 0;
+}
+
+.counter2 {
+  background: url(image.png) -14px 0;
+}
+
+.counter3 {
+  background: url(image.png) -28px 0;
+}
+
+.counter4 {
+  background: url(image.png) -42px 0;
+}
+
+.counter5 {
+  background: url(image.png) -56px 0;
+}
+
+.counter6 {
+  background: url(image.png) -70px 0;
+}
+.counter7 {
+  background: url(image.png) -84px 0;
+}
+.counter8 {
+  background: url(image.png) -98px 0;
+}
+.counter9 {
+  background: url(image.png) -112px 0;
+}
+.counter0 {
+  background: url(image.png) -126px 0;
+}
+#smiley {
+  width: 27px;
+  height: 27px;
+  background: url(image.png) 1px -24px;
+}
+#smiley:active {
+
+  background: url(image.png) -28px -24px;
+}
+#smiley.fear {
+
+  background: url(image.png) -53px -24px;
+}
+#smiley.cool {
+
+  background: url(image.png) -80px -24px;
+}
+#smiley.sad {
+  background: url(image.png) -108px -24px;
+}
+main > * {
+  width: 16px;
+  height: 16px;
+}
+
+main > .hiden {
+  background: url(image.png) 0 -51px;
+}
+main > .empty {
+  background: url(image.png) -17px -51px;
+}
+main > .flaged {
+  background: url(image.png) -34px -51px;
+}
+
+main > .quetionHide {
+  background: url(image.png) -51px -51px;
+}
+main > .quetion {
+  background: url(image.png) -68px -51px;
+}
+main > .mined {
+  background: url(image.png) -85px -51px;
+}
+main > .explosion {
+  background: url(image.png) -102px -51px;
+}
+main > .mistake {
+  background: url(image.png) -119px -51px;
+}
+
+
+
+main > .number1 {
+  background: url(image.png) -0px -68px;
+}
+main > .number2 {
+  background: url(image.png) -17px -68px;
+}
+main > .number3 {
+  background: url(image.png) -34px -68px;
+}
+main > .number4 {
+  background: url(image.png) -51px -68px;
+}
+main > .number5 {
+  background: url(image.png) -68px -68px;
+}
+main > .mined {
+  background: url(image.png) -85px -51px;
+}
+main > .number7 {
+  background: url(image.png) -102px -68px;
+}
+main > .number8 {
+  background: url(image.png) -119px -68px;
+}
