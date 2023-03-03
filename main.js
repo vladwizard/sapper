@@ -157,9 +157,8 @@ class Sapper {
 
           this.smiley
         );
-        this.mat[i][j].oncontextmenu = (e) => {
+        this.mat[i][j].element.oncontextmenu = (e) => {
           e.preventDefault();
-          console.log(this.minesCounter);
           this.mat[i][j].RightClick(this.minesCounter);
         };
       }
