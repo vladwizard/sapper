@@ -47,7 +47,7 @@ class Cell {
   flaged = false;
   quetion = false;
   element = null;
-  constructor(element, click, smiley) {
+  constructor(element, click, minesCounter, smiley) {
     this.element = element;
     this.element.onclick = click;
     this.smiley = smiley;
@@ -64,6 +64,10 @@ class Cell {
         smiley.className = "";
         this.Reset(smiley);
       }
+    };
+    this.element.oncontextmenu = (e) => {
+      e.preventDefault();
+      this.RightClick(minesCounter);
     };
     this.Hide();
   }
@@ -154,13 +158,9 @@ class Sapper {
           () => {
             this.Click(i, j);
           },
-
+          this.minesCounter,
           this.smiley
         );
-        this.mat[i][j].element.oncontextmenu = (e) => {
-          e.preventDefault();
-          this.mat[i][j].RightClick(this.minesCounter);
-        };
       }
     }
   }
@@ -255,13 +255,9 @@ class Sapper {
           () => {
             this.Click(i, j);
           },
-
+          this.minesCounter,
           this.smiley
         );
-        newCell.element.oncontextmenu = (e) => {
-          e.preventDefault();
-          this.mat[i][j].RightClick(this.minesCounter);
-        };
         this.area.append(newCell.element);
         newArr.push(newCell);
       }
