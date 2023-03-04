@@ -86,8 +86,10 @@ class Cell {
     if (this.mined) {
       this.element.className = "mined";
     } else {
-      if (this.minesAround == 0) this.element.className = "empty";
-      else this.element.className = "number" + this.minesAround;
+      if (this.minesAround == 0) {
+        if (this.quetion) this.element.className = "quetion";
+        else this.element.className = "empty";
+      } else this.element.className = "number" + this.minesAround;
     }
     this.hiden = false;
     this.Stop();
@@ -140,7 +142,7 @@ class Sapper {
     { i: 1, j: 1 },
   ];
   size = 16;
-  startMines = 40;
+  startMines = 10;
   cellsMat = [];
 
   constructor() {
