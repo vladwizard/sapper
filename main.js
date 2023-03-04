@@ -35,6 +35,12 @@ class MinesCounter extends Counter {
   constructor(element) {
     super(element);
   }
+  Increase() {
+    this.SetNumber(this.number + 1);
+  }
+  Decrease() {
+    this.SetNumber(this.number - 1);
+  }
   SetNumber(x) {
     this.number = x;
     this.Refresh();
@@ -47,33 +53,35 @@ class Cell {
   flaged = false;
   quetion = false;
   element = null;
-  constructor(element, click, minesCounter, smiley) {
+  constructor(element, minesCounter, smiley) {
     this.element = element;
-    this.element.onclick = click;
-    this.smiley = smiley;
+
+    this.element.oncontextmenu = (e) => {
+      e.preventDefault(e);
+      this.RightClick(minesCounter);
+    };
+
+    function Reset() {
+      smiley.className = "";
+      this.element.onmouseout = null;
+    }
     this.element.onmousedown = (e) => {
       if (e.button == 0) {
         smiley.className = "fear";
         this.element.onmouseout = () => {
-          this.Reset(smiley);
+          Reset.call(this);
         };
       }
     };
     this.element.onmouseup = (e) => {
       if (e.button == 0) {
         smiley.className = "";
-        this.Reset(smiley);
+        Reset.call(this);
       }
     };
-    this.element.oncontextmenu = (e) => {
-      e.preventDefault();
-      this.RightClick(minesCounter);
-    };
-    this.Hide();
-  }
-  Hide() {
     this.element.className = "hiden";
   }
+
   Show() {
     if (this.mined) {
       this.element.className = "mined";
@@ -87,10 +95,7 @@ class Cell {
   Mine() {
     this.mined = true;
   }
-  Reset() {
-    this.smiley.className = "";
-    this.element.onmouseout = null;
-  }
+
   Stop() {
     this.element.onclick = () => {};
     this.element.onmousedown = () => {};
@@ -99,39 +104,20 @@ class Cell {
       e.preventDefault();
     };
   }
-  RightClick(counter) {
+  RightClick(minesCounter) {
     if (this.hiden) {
       if (this.flaged) {
-        counter.SetNumber(counter.number + 1);
+        minesCounter.Increase();
         this.flaged = false;
         this.quetion = true;
         this.element.className = "quetionHide";
       } else if (this.quetion) {
-        this.flaged = false;
         this.quetion = false;
         this.element.className = "hiden";
       } else {
         this.flaged = true;
         this.element.className = "flaged";
-        counter.SetNumber(counter.number - 1);
-      }
-    }
-  }
-  LeftClick(counter) {
-    if (this.hiden) {
-      if (this.flaged) {
-        counter.SetNumber(counter.number + 1);
-        this.flaged = false;
-        this.quetion = true;
-        this.element.className = "quetionHide";
-      } else if (this.quetion) {
-        this.flaged = false;
-        this.quetion = false;
-        this.element.className = "hiden";
-      } else {
-        this.flaged = true;
-        this.element.className = "flaged";
-        counter.SetNumber(counter.number - 1);
+        minesCounter.Decrease();
       }
     }
   }
@@ -142,7 +128,7 @@ class Sapper {
   minesCounter = new MinesCounter(document.getElementById("minesCounter"));
   smiley = document.getElementById("smiley");
   area = document.querySelector("main");
-  
+
   pathsAround = [
     { i: -1, j: -1 },
     { i: -1, j: 0 },
@@ -175,15 +161,50 @@ class Sapper {
     }
   }
   CreateCell(element, i, j) {
-    return new Cell(
-      element,
-      () => {
-        this.Click(i, j);
-      },
-      this.minesCounter,
-      this.smiley
-    );
+    let cell = new Cell(element, this.minesCounter, this.smiley);
+
+    cell.element.onclick = () => this.LeftClick(i, j);
+
+    return cell;
   }
+  LeftClick(i, j) {
+    if (this.firstClick) {
+      this.firstClick = false;
+      this.FillByMines({ i, j });
+      this.CountMinesAroundInAllCells();
+    }
+    let cell = this.cellsMat[i][j];
+    if (cell.mined) {
+      cell.Show();
+      cell.element.className = "explosion";
+      this.Lose();
+    } else if (cell.minesAround == 0) {
+      function openAroundEmty(i, j, further = true) {
+        this.cellsMat[i][j].Show();
+        this.unopenedCell--;
+        if (further) {
+          for (let path of this.pathsAround) {
+            let currentCell = this.cellsMat[i + path.i]?.[j + path.j];
+            if (currentCell) {
+              if (currentCell.hiden == true) {
+                if (currentCell.minesAround == 0) {
+                  openAroundEmty.call(this, i + path.i, j + path.j, true);
+                } else {
+                  openAroundEmty.call(this, i + path.i, j + path.j, false);
+                }
+              }
+            }
+          }
+        }
+      }
+      openAroundEmty.call(this, i, j);
+    } else {
+      cell.Show();
+      this.unopenedCell--;
+    }
+    if (this.unopenedCell == 0) this.Win();
+  }
+
   SetInitialValues() {
     this.timer.Start();
     this.unopenedCell = this.cellCount - this.startMines;
@@ -202,57 +223,6 @@ class Sapper {
         );
       }
     }
-  }
-  Click(i, j) {
-    if (this.firstClick) {
-      this.firstClick = false;
-      this.FillByMines({ i, j });
-      this.CountMinesAroundInAllCells();
-    }
-    let cell = this.cellsMat[i][j];
-    if (cell.mined) {
-      cell.Show();
-      cell.element.className = "explosion";
-      this.Lose();
-    } else if (cell.minesAround == 0) {
-      function aroundHandle(i, j, cellsMat, pathsAround, reduce, further = true) {
-        cellsMat[i][j].Show();
-        reduce();
-        if (further) {
-          for (let path of pathsAround) {
-            let current = cellsMat[i + path.i]?.[j + path.j];
-            if (current) {
-              if (current.hiden == true) {
-                if (current.minesAround == 0) {
-                  aroundHandle(
-                    i + path.i,
-                    j + path.j,
-                    cellsMat,
-                    pathsAround,
-                    reduce,
-                    true
-                  );
-                } else {
-                  aroundHandle(
-                    i + path.i,
-                    j + path.j,
-                    cellsMat,
-                    pathsAround,
-                    reduce,
-                    false
-                  );
-                }
-              }
-            }
-          }
-        }
-      }
-      let byMe = aroundHandle(i, j, this.cellsMat, this.pathsAround, () => this.unopenedCell--);
-    } else {
-      cell.Show();
-      this.unopenedCell--;
-    }
-    if (this.unopenedCell == 0) this.Win();
   }
 
   Win() {
