@@ -53,8 +53,7 @@
   background: url(image.png) 1px -24px;
 }
 #smiley:active {
-
-  background: url(image.png) -28px -24px;
+  background: url(image.png) -27px -24px;
 }
 #smiley.fear {
 
