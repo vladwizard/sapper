@@ -117,9 +117,11 @@ class Cell {
         this.quetion = false;
         this.element.className = "hiden";
       } else {
-        this.flaged = true;
-        this.element.className = "flaged";
-        minesCounter.Decrease();
+        if (minesCounter.number > 0) {
+          this.flaged = true;
+          this.element.className = "flaged";
+          minesCounter.Decrease();
+        }
       }
     }
   }
@@ -142,7 +144,7 @@ class Sapper {
     { i: 1, j: 1 },
   ];
   size = 16;
-  startMines = 10;
+  startMines = 40;
   cellsMat = [];
 
   constructor() {
@@ -232,7 +234,7 @@ class Sapper {
     this.timer.Stop();
     for (let i = 0; i < this.size; i++) {
       for (let j = 0; j < this.size; j++) {
-        cell.Stop();
+        this.cellsMat[i][j].Stop();
       }
     }
   }
