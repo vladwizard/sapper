@@ -246,7 +246,7 @@ class Sapper {
         let cell = this.cellsMat[i][j];
         if (cell.hiden) {
           if (cell.flaged && !cell.mined) cell.element.className = "mistake";
-          else if (cell.mined) cell.element.className = "mined";
+          else if (cell.mined && !cell.flaged) cell.element.className = "mined";
         }
         cell.Stop();
       }
