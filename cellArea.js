@@ -2,22 +2,34 @@ export default class CellArea {
     domElement = document.getElementById("area")
 
     size = 16;
+    cellCount = Math.po
     pathsAround = [-this.size - 1, -this.size, -this.size + 1, -1, +1, this.size - 1, this.size, this.size + 1];
     cells = new Array(this.size * this.size);
 
     startMines = 40;
 
-    unopenedCell = this.cellCount - this.startMines;
-    firstClick = true
+    SetInitialValues() {
+        this.firstClick = true
+        this.unopenedCell = this.cellCount - this.startMines;
+        this.mineCounter.SetNumber(this.startMines);
+    }
 
-    constructor(Win, Lose, mineCounter, smiley) {
-        this.smiley = smiley
+    constructor(Win, Lose, FearToggle, mineCounter) {
+        this.FearToggle = FearToggle
         this.Win = Win
         this.Lose = Lose
         this.mineCounter = mineCounter
 
+        this.SetInitialValues();
         this.BuildArea()
 
+    }
+    Reset() {
+        this.SetInitialValues();
+
+        for (let i in this.cells) {
+            this.cells[i].Reset()
+        }
     }
     Stop() {
         for (let cell of this.cells) {
@@ -65,31 +77,13 @@ export default class CellArea {
 
     BuildArea() {
         for (let i = 0; i < this.cells.length; i++) {
-            this.cells[i] = new Cell(document.createElement("div"), this.smiley, this.minesCounter);
+            this.cells[i] = new Cell(document.createElement("div"), this.FearToggle, this.mineCounter, () => this.LeftClick(i))
 
-            this.cells[i].domElement.onclick = () => this.LeftClick(i)
 
             this.domElement.append(this.cells[i].domElement)
         }
     }
 
-    Reset() {
-        this.unopenedCell = this.cellCount - this.startMines;
-        this.minesCounter.SetNumber(this.startMines);
-        this.firstClick = true;
-
-        this.SetInitialValues();
-
-        for (let i = 0; i < this.size; i++) {
-            for (let j = 0; j < this.size; j++) {
-                this.cellsMat[i][j] = this.CreateCell(
-                    this.cellsMat[i][j].element,
-                    i,
-                    j
-                );
-            }
-        }
-    }
     FillByMines(except) {
         let r = Array.from(Array(this.cells.length).keys());
         r.splice(except, 1);
@@ -111,14 +105,11 @@ export default class CellArea {
             }
         }
     }
-    Reset() {
-        this.unopenedCell = this.cellCount - this.startMines;
-        this.minesCounter.SetNumber(this.startMines);
-        this.firstClick = true;
-    }
+
     Open() {
         for (let cell of this.cells) {
-            cell.Show()
+            if (cell.mined)
+                cell.Show()
         }
     }
 }
@@ -126,18 +117,18 @@ class Cell {
     minesAround = 0;
     mined = false;
     hiden = true;
-    domElement = null;
-
+    domElement;
+    gear = 0
     RightClick = function () {
-        let gear = 0
+
         let classes = {
             0: () => {
                 this.domElement.className = "hiden"
-                this.minesCounter.Decrease();
-            },
-            1: () => {  
-                this.domElement.classList.add("flaged")
                 this.minesCounter.Increase();
+            },
+            1: () => {
+                this.domElement.classList.add("flaged")
+                this.minesCounter.Decrease();
             },
             2: () => {
                 this.domElement.classList.remove("flaged")
@@ -145,40 +136,52 @@ class Cell {
             }
         }
         return () => {
-            gear++
-            if (gear == 3) gear = 0
-            classes[gear].call(this)
+            this.gear++
+            if (this.gear == 3) this.gear = 0
+            classes[this.gear].call(this)
         }
     }.call(this)
-
-    constructor(domElement, smiley, minesCounter) {
+    Reset() {
+        this.minesAround = 0;
+        this.mined = false;
+        this.hiden = true;
+        this.gear = 0
+        this.ResetDomElement()
+    }
+    constructor(domElement, FearToggle, minesCounter, LeftClick) {
         this.minesCounter = minesCounter
-        this.domElement = domElement;
+        this.domElement = domElement
+        this.FearToggle = FearToggle
+        this.LeftClick = LeftClick
+        this.Reset()
+    }
+
+    ResetDomElement() {
+        this.domElement.onclick = this.LeftClick
         this.domElement.oncontextmenu = (e) => {
             this.RightClick.call(this)
             e.preventDefault(e);
         };
-        function Reset() {
+        function ResetSmiley() {
             smiley.className = "";
             this.domElement.onmouseout = null;
         }
         this.domElement.onmousedown = (e) => {
             if (e.button == 0) {
-                smiley.className = "fear";
+                this.FearToggle()
                 this.domElement.onmouseout = () => {
-                    Reset.call(this);
+                    ResetSmiley.call(this);
                 };
             }
         };
         this.domElement.onmouseup = (e) => {
             if (e.button == 0) {
-                smiley.className = "";
-                Reset.call(this);
+                this.FearToggle()
+                ResetSmiley.call(this);
             }
         };
         this.domElement.className = "hiden";
     }
-
     Show() {
         this.domElement.classList.remove('hiden')
         if (this.mined) {

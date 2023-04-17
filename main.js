@@ -2,20 +2,22 @@ import { MinesCounter, Timer } from './counters.js'
 import CellArea from './cellArea.js'
 
 class Smiley {
-  smiley = document.getElementById("smiley")
+  domElement = document.getElementById("smiley")
   constructor(ResetGame) {
-
-    this.smiley.onclick = ResetGame;
+    this.domElement.onclick = ResetGame;
+  }
+  FearToggle() {
+    this.domElement.classList.toggle('fear')
   }
 }
 class Sapper {
   timer = new Timer();
   minesCounter = new MinesCounter();
-  smiley = new Smiley(this.ResetGame);
-  area = new CellArea(this.Win, this.Lose, this.minesCounter, this.smiley);
+  smiley = new Smiley(() => this.ResetGame());
+  area = new CellArea(() => this.Win(), () => this.Lose(), () => this.smiley.FearToggle(), this.minesCounter);
 
   constructor() {
-    // this.SetInitialValues();
+    this.timer.Start();
   }
 
   ResetGame() {
